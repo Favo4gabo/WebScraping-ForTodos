@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "*"
+scrapy = "*"
+flask = "*"
+bs4 = "*"
+requests = "*"
+beautifulsoup4 = "*"
+openpyxl = "*"
+gspread = "*"
+gspread-dataframe = "*"
+google-auth = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
+
+[scripts]
+start = "python ./app.py"
+front = "python -m http.server 3000"
