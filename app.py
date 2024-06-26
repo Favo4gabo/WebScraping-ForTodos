@@ -139,9 +139,9 @@
 # CUARTO INTENTO
 # -------------------------------------------------------------
 from flask import Flask, request, render_template_string
+import pandas
 import requests
 from bs4 import BeautifulSoup
-import pandas
 
 # Crear una instancia de la aplicación Flask
 app = Flask(__name__)
@@ -170,7 +170,7 @@ def procesar():
         precio = soup.select_one('span.andes-money-amount__fraction').text.strip()
         
         # Agregar los datos extraídos a la lista
-        data.append({'Nombre': nombre, 'Precio': precio})
+        data.append({'Nombre del producto': nombre, 'Precio': precio})
         print(data)
 
     # Crear un DataFrame de pandas con los datos extraídos
