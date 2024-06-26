@@ -185,3 +185,56 @@ def procesar():
 if __name__ == '__main__':
     app.run(debug=True)
     
+
+
+
+
+# --------------------------------------------------------------
+# AHORA CON TODAS LAS CATEGORIAS
+# ---------------------------------------------------------------------
+
+# from flask import Flask, request, render_template_string
+# import pandas as pd
+# import requests
+# from bs4 import BeautifulSoup
+
+# app = Flask(__name__)
+
+# @app.route('/')
+# def index():
+#     return render_template_string(open('formulario.html').read())
+
+# @app.route('/procesar', methods=['POST'])
+# def procesar():
+#     urls = request.form['urls'].strip().split('\n')
+#     productos = []
+
+#     for url in urls:
+#         response = requests.get(url)
+#         soup = BeautifulSoup(response.content, 'html.parser')
+        
+#         nombre = soup.find('h1', {'class': 'ui-pdp-title'}).text.strip()
+#         precio = soup.find('span', {'class': 'price-tag-fraction'}).text.strip()
+#         categoria = soup.find('a', {'class': 'andes-breadcrumb__link'}).text.strip()
+#         sub_categoria = soup.find_all('a', {'class': 'andes-breadcrumb__link'})[1].text.strip()
+#         condicion = soup.find('span', {'class': 'ui-pdp-subtitle'}).text.strip()
+#         descripcion = soup.find('p', {'class': 'ui-pdp-description__content'}).text.strip()
+#         fotos = [img['src'] for img in soup.find_all('img', {'class': 'ui-pdp-image'})]
+        
+#         productos.append({
+#             'Nombre': nombre,
+#             'Precio': precio,
+#             'Categoría': categoria,
+#             'Sub-categoría': sub_categoria,
+#             'Condición': condicion,
+#             'Descripción': descripcion,
+#             'Fotos': ', '.join(fotos)
+#         })
+    
+#     df = pd.DataFrame(productos)
+#     df.to_excel('productos.xlsx', index=False)
+    
+#     return 'Archivo Excel generado con éxito.'
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
