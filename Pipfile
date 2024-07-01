@@ -5,15 +5,11 @@ name = "pypi"
 
 [packages]
 pandas = "*"
-scrapy = "*"
 flask = "*"
 bs4 = "*"
 requests = "*"
 beautifulsoup4 = "*"
 openpyxl = "*"
-gspread = "*"
-gspread-dataframe = "*"
-google-auth = "*"
 
 [dev-packages]
 
