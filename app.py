@@ -87,43 +87,45 @@ import pandas
 import requests
 from bs4 import BeautifulSoup
 
-
-
-
-    
 # Abre el libro de Excel
 workbook = openpyxl.load_workbook('data.xlsx')
 sheet = workbook['Links']  # Cambia el nombre de la hoja según sea necesario
+
+data = []
 
 # Recorre las filas y extrae los hipervínculos
 for row in sheet.iter_rows():
     cell = row[2]  # Cambia el índice de columna según sea necesario
     if cell.hyperlink:
-        print(f"Texto: {cell.value}, URL: {cell.hyperlink.target}")
-
-    nombre = cell.value
-    urls = cell.hyperlink.target
-    data = []
-    
-    for url in urls:
-        response = requests.get(url.strip())  # Realizar la solicitud HTTP a la URL
+        nombre = cell.value
+        urls = cell.hyperlink.target
+        
+        
+        response = requests.get(urls.strip())  # Realizar la solicitud HTTP a la URL
         soup = BeautifulSoup(response.content, 'html.parser')  # Parsear el contenido HTML
         
         # Extraer el nombre y el precio del producto usando selectores CSS
         # Ajusta los selectores según la estructura de la página de Mercado Libre
-        precio = soup.select_one('span.andes-money-amount__fraction').text.strip()
+        try:
+            precio = soup.select_one("span.ui-pdp-subtitle").text.strip()
+        except AttributeError:
+            precio = "N/A"
+        
+        # Agregar los datos extraídos a la lista
+        data.append({'Nombre del producto': nombre, 'URL': urls, 'Precio': precio})
 
+# Crear un DataFrame de pandas con los datos extraídos
+df = pandas.DataFrame(data)
+# Guardar el DataFrame en un archivo Excel
+df.to_excel('productos.xlsx', index=False)
 
-    # Agregar los datos extraídos a la lista
-    data.append({'Nombre del producto': nombre, 'URL': urls, 'Precio': precio})
-    # print(data)
-
-    # Crear un DataFrame de pandas con los datos extraídos
-    df = pandas.DataFrame(data)
-    # Guardar el DataFrame en un archivo Excel
-    df.to_excel('productos.xlsx', index=False)
+print("Precios extraídos y guardados en 'productos.xlsx'")
         
 # ------------------------------------------------------------------------------
+
+
+
+# print(f"Texto: {cell.value}, URL: {cell.hyperlink.target}")
     
 
     
