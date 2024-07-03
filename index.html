@@ -22,9 +22,15 @@
         </div>
     </div> -->
 
-    <form class="ms-5" action="/procesar" method="post">
-        <label for="urls">Ingrese las URLs de los productos (una por línea):</label><br>
+    <form class="ms-5" action="/manual" method="post">
+        <label for="urls">Ingrese las URLs de los productos (una por linea):</label><br>
         <textarea id="urls" name="urls" rows="20" cols="50"></textarea><br>
+        <input type="submit" value="Procesar">
+    </form>
+
+    <form class="ms-5" action="/automatico" method="post" enctype="multipart/form-data">
+        <label for="formFile" class="form-label">Default file input example</label>
+        <input class="form-control" type="file" id="formFile" name="file">
         <input type="submit" value="Procesar">
     </form>
 
