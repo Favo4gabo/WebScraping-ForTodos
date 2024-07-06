@@ -10,6 +10,7 @@ bs4 = "*"
 requests = "*"
 beautifulsoup4 = "*"
 openpyxl = "*"
+selenium = "*"
 
 [dev-packages]
 
