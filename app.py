@@ -210,138 +210,222 @@
 #     app.run(debug=True)
     
 
-    
-from flask import Flask, request, render_template_string
-import openpyxl
-import pandas
-import requests
-from bs4 import BeautifulSoup
-import time
 
-app = Flask(__name__)
+# ------------------------------------------------------------------------------------------
+# ESTE ES EL QUE SIRVE
+# -------------------------------------------------------------------------------------------------
 
-# Ruta para la página principal que muestra el formulario
-@app.route('/')
-def index():
-    # Renderiza el formulario HTML
-    return render_template_string(open('index.html').read())
 
-# Ruta para procesar los datos enviados desde el formulario
-@app.route('/procesar', methods=['POST'])
-def procesar():
-    # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
-    urls = request.form['urls'].split('\n')
-    data = []
+# from flask import Flask, request, render_template_string
+# import openpyxl
+# import pandas
+# import requests
+# from bs4 import BeautifulSoup
+# import time
 
-    # Iterar sobre cada URL para extraer la información del producto
-    for url in urls:
-        # try:
-            response = requests.get(url.strip())  # Realizar la solicitud HTTP a la URL
-            response.raise_for_status()  # Verificar si la solicitud fue exitosa
-            soup = BeautifulSoup(response.content, 'html.parser')  # Parsear el contenido HTML
+# app = Flask(__name__)
+
+# # Ruta para la página principal que muestra el formulario
+# @app.route('/')
+# def index():
+#     # Renderiza el formulario HTML
+#     return render_template_string(open('index.html').read())
+
+# # Ruta para procesar los datos enviados desde el formulario
+# @app.route('/procesar', methods=['POST'])
+# def procesar():
+#     # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
+#     urls = request.form['urls'].split('\n')
+#     data = []
+
+#     # Iterar sobre cada URL para extraer la información del producto
+#     for url in urls:
+#         # try:
+#             response = requests.get(url.strip())  # Realizar la solicitud HTTP a la URL
+#             response.raise_for_status()  # Verificar si la solicitud fue exitosa
+#             soup = BeautifulSoup(response.content, 'html.parser')  # Parsear el contenido HTML                        
             
-            # Extraer el nombre y el precio del producto usando selectores CSS
-            nombre = soup.select_one('h1').text if soup.select_one('h1') else 'N/A'
-            precio_entero = soup.select_one('span.andes-money-amount__fraction').text if soup.select_one('span.andes-money-amount__fraction') else 'N/A'
-            precio_decimal = soup.select_one('span.andes-money-amount__cents').text if soup.select_one('span.andes-money-amount__cents') else '00'
+#             # # Extraer el nombre y el precio del producto usando selectores CSS
+#             nombre = soup.select_one('h1').text if soup.select_one('h1') else 'N/A'
             
-            # Combinar la parte entera y decimal del precio
-            precio = f"{precio_entero},{precio_decimal}" if precio_entero != 'N/A' else 'N/A'
+#             precio_entero = soup.select_one('span.andes-money-amount__fraction').text if soup.select_one('span.andes-money-amount__fraction') else 'N/A'
+#             precio_decimal = soup.select_one('span.andes-money-amount__cents').text if soup.select_one('span.andes-money-amount__cents') else '00'            
+#             # Combinar la parte entera y decimal del precio
+#             precio = f"{precio_entero},{precio_decimal}" if precio_entero != 'N/A' else 'N/A'
+
+#             # Extraer URLs de las imágenes
+#             imagenes = soup.select('img.ui-pdp-image.ui-pdp-gallery__figure__image')
+#             imagen_1 = imagenes[0].get('data-zoom', imagenes[0].get('src')) if len(imagenes) > 0 else 'N/A'
+#             imagen_2 = imagenes[1].get('data-zoom', imagenes[1].get('src')) if len(imagenes) > 1 else 'N/A'
             
-            # Verificar múltiples selectores para las descripciones
-            # descripcion_1 = (soup.select_one('p.ui-pdp-description__content').text if soup.select_one('p.ui-pdp-description__content') else
-            #                  soup.select_one('div.ui-pdp-description').text if soup.select_one('div.ui-pdp-description') else
-            #                  soup.select_one('div.ui-pdp-collapsable__container').text if soup.select_one('div.ui-pdp-collapsable__container') else
-            #                  soup.select_one('div.ui-pdp-collapsable ui-pdp-description-collapse').text if soup.select_one('div.ui-pdp-description') else
-            #                  soup.select_one('div.ui-pdp-container__row ui-pdp-container__row--description').text if soup.select_one('div.ui-pdp-container__row ui-pdp-container__row--description') else
-            #                  'N/A')           
-            # descripcion_2 = (soup.select_one('div.ui-pdp-collapsable__container').text if soup.select_one('div.ui-pdp-collapsable__container') else
-            #                  soup.select_one('div.ui-pdp-collapsable__content').text if soup.select_one('div.ui-pdp-collapsable__content') else
-            #                  soup.select_one('div.ui-pdp-description').text if soup.select_one('div.ui-pdp-description') else
-            #                  'N/A')
-            
-            descripcion_tag_1 = soup.select_one('p.ui-pdp-description__content')
-            if descripcion_tag_1 is not None:
-              descripcion_1 = descripcion_tag_1.text.strip()
+#             condicion_tag = soup.select_one('span.ui-pdp-subtitle')
+#             if condicion_tag is not None:
+#               condicion = condicion_tag.text.strip()
               
-            descripcion_tag_2 = soup.select_one('div.ui-pdp-description')
-            if descripcion_tag_2 is not None:
-              descripcion_2 = descripcion_tag_2.text.strip()
-            # descripcion_3 = (soup.select_one('div.ui-pdp-container__row ui-pdp-container__row--description').text if soup.select_one('div.ui-pdp-collapsable ui-pdp-description-collapse') else
-            #                  soup.select_one('div.ui-pdp-collapsable ui-pdp-description-collapse').text if soup.select_one('div.ui-pdp-collapsable__container') else
-            #                  soup.select_one('div.ui-pdp-collapsable__container').text if soup.select_one('div.ui-pdp-description') else
-            #                  soup.select_one('div.ui-pdp-description').text if soup.select_one('p.ui-pdp-description__content') else
-            #                  soup.select_one('p.ui-pdp-description__content').text if soup.select_one('p.ui-pdp-description__content') else
-            #                  'N/A')
+#             descripcion = soup.select_one("p.ui-pdp-description__content").text.strip() if soup.select_one('p.ui-pdp-description__content') else "Descripcion no encontrada"
+#             descripcion2 = soup.select_one("div.ui-pdp-description").text.strip() if soup.select_one('div.ui-pdp-description') else "Descripcion no encontrada"
 
-            # Extraer URLs de las imágenes
-            imagenes = soup.select('img.ui-pdp-image.ui-pdp-gallery__figure__image')
-            imagen_1 = imagenes[0].get('data-zoom', imagenes[0].get('src')) if len(imagenes) > 0 else 'N/A'
-            imagen_2 = imagenes[1].get('data-zoom', imagenes[1].get('src')) if len(imagenes) > 1 else 'N/A'
+#             # Agregar los datos extraídos a la lista
+#             data.append({'Nombre':nombre, 'Precio':precio, 'Condicion': condicion, 'Descripcion': descripcion, 'Descripcion 2': descripcion2, 'Imagen 1': imagen_1, 'Imagen 2': imagen_2 })            
+
+#     # Crear un DataFrame de pandas con los datos extraídos
+#     df = pandas.DataFrame(data)
+#     # Guardar el DataFrame en un archivo Excel
+#     df.to_excel('Productos.xlsx', index=False)
+    
+#     print(data)
+
+#     # Devolver un mensaje de éxito
+#     return 'Archivo Excel generado con éxito.'
+
+# # Ruta para extraer hipervínculos de un archivo Excel y guardarlos en otro archivo Excel
+# # @app.route('/extract_links', methods=['POST'])
+# # def extract_links():
+# #     # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
+# #     file = request.files['file']
+    
+# #     # Abre el libro de Excel
+# #     workbook = openpyxl.load_workbook(file)
+# #     sheet = workbook['Links']  # Cambia el nombre de la hoja según sea necesario
+
+# #     data = []
+
+# #     # Recorre las filas y extrae los hipervínculos
+# #     for row in sheet.iter_rows():
+# #         cell = row[2]  # Cambia el índice de columna según sea necesario
+# #         if cell.hyperlink:
+# #             nombre = cell.value
+# #             urls = cell.hyperlink.target
+
+# #             # Agregar los datos extraídos a la lista
+# #             data.append({'Nombre del producto': nombre, 'URL': urls})
+
+# #     # Crear un DataFrame de pandas con los datos extraídos
+# #     df = pandas.DataFrame(data)
+# #     # Guardar el DataFrame en un archivo Excel
+# #     df.to_excel('URLs.xlsx', index=False)
+    
+# #     print(data)
+
+# #     return "Nombres y URLs extraídos y guardados en 'URLs.xlsx'"
+
+# # Ejecutar la aplicación Flask
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
+# -------------------------------------------------------------------------------------------------------
+
+# ESTE ELIMINA LOS DUPLICADOS
+
+# from flask import Flask, request, render_template_string
+# import openpyxl
+# import pandas as pd
+# import requests
+# from bs4 import BeautifulSoup
+# import time
+# app = Flask(__name__)
+# # Ruta para la página principal que muestra el formulario
+# @app.route('/')
+# def index():
+#     # Renderiza el formulario HTML
+#     return render_template_string(open('index.html').read())
+# # Ruta para procesar los datos enviados desde el formulario
+# @app.route('/procesar', methods=['POST'])
+# def procesar():
+#     # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
+#     urls = request.form['urls'].split('\n')
+#     data = []
+#     # Iterar sobre cada URL para extraer la información del producto
+#     for url in urls:
+#         # try:
+#             response = requests.get(url.strip())  # Realizar la solicitud HTTP a la URL
+#             response.raise_for_status()  # Verificar si la solicitud fue exitosa
+#             soup = BeautifulSoup(response.content, 'html.parser')  # Parsear el contenido HTML
             
-            condicion_tag = soup.select_one('span.ui-pdp-subtitle')
-            if condicion_tag is not None:
-              condicion = condicion_tag.text.strip()
-
-            # Agregar los datos extraídos a la lista
-            data.append({'Nombre': nombre, 'Precio': precio, 'Condicion': condicion, 'Imagen 1': imagen_1, 'Imagen 2': imagen_2, 'Descripcion 1': descripcion_1, 'Descripcion 2': descripcion_2})
-            # 'Descripcion 3': descripcion_3,
-
-            # Pausar entre solicitudes para evitar ser bloqueado
-            time.sleep(2)
-
-        # except requests.RequestException as e:
-        #     print(f"Error al procesar la URL {url.strip()}: {e}")
-        #     data.append({'Nombre': 'N/A', 'Descripcion 1': 'N/A', 'Descripcion 2': 'N/A', 'Descripcion 3': 'N/A', 'Imagen 1': 'N/A', 'Imagen 2': 'N/A', 'Precio': 'N/A'})
-        # except Exception as e:
-        #     print(f"Error al procesar la URL {url.strip()}: {e}")
-        #     data.append({'Nombre': 'N/A', 'Descripcion 1': 'N/A', 'Descripcion 2': 'N/A', 'Descripcion 3': 'N/A', 'Imagen 1': 'N/A', 'Imagen 2': 'N/A', 'Precio': 'N/A'})
-
-    # Crear un DataFrame de pandas con los datos extraídos
-    df = pandas.DataFrame(data)
-    # Guardar el DataFrame en un archivo Excel
-    df.to_excel('Productos5.xlsx', index=False)
+#             # Extraer el nombre y el precio del producto usando selectores CSS
+#             nombre = soup.select_one('h1').text if soup.select_one('h1') else 'N/A'
+#             precio_entero = soup.select_one('span.a-price-whole').text if soup.select_one('span.andes-money-amount__fraction') else 'N/A'
+#             precio_decimal = soup.select_one('span.a-price-fraction').text if soup.select_one('span.andes-money-amount__cents') else '00'
+#             # Combinar la parte entera y decimal del precio
+#             precio = f"{precio_entero},{precio_decimal}" if precio_entero != 'N/A' else 'N/A'
+            
+            
+            
+#             # # Verificar múltiples selectores para las descripciones
+#             # descripcion_tag_1 = soup.select_one('p.ui-pdp-description__content')
+#             # if descripcion_tag_1 is not None:
+#             #   descripcion_1 = descripcion_tag_1.text.strip()
+#             # descripcion_tag_2 = soup.select_one('div.ui-pdp-description')
+#             # if descripcion_tag_2 is not None:
+#             #   descripcion_2 = descripcion_tag_2.text.strip()
+              
+            
+#             descripcion = soup.select_one('ul.a-unordered-list a-vertical a-spacing-mini').text if soup.select_one('ul.a-unordered-list a-vertical a-spacing-mini') else 'N/A'
+              
+            
+#             # descripcion_3 = (soup.select_one('div.ui-pdp-container__row ui-pdp-container__row--description').text if soup.select_one('div.ui-pdp-collapsable ui-pdp-description-collapse') else
+#             #                  soup.select_one('div.ui-pdp-collapsable ui-pdp-description-collapse').text if soup.select_one('div.ui-pdp-collapsable__container') else
+#             #                  soup.select_one('div.ui-pdp-collapsable__container').text if soup.select_one('div.ui-pdp-description') else
+#             #                  soup.select_one('div.ui-pdp-description').text if soup.select_one('p.ui-pdp-description__content') else
+#             #                  soup.select_one('p.ui-pdp-description__content').text if soup.select_one('p.ui-pdp-description__content') else
+#             #                  'N/A')
+#             # Extraer URLs de las imágenes
+#             imagenes = soup.select('img.ui-pdp-image.ui-pdp-gallery__figure__image')
+#             imagen_1 = imagenes[0].get('data-zoom', imagenes[0].get('src')) if len(imagenes) > 0 else 'N/A'
+#             imagen_2 = imagenes[1].get('data-zoom', imagenes[1].get('src')) if len(imagenes) > 1 else 'N/A'
+#             condicion_tag = soup.select_one('span.ui-pdp-subtitle')
+#             if condicion_tag is not None:
+#               condicion = condicion_tag.text.strip()
+#             # Agregar los datos extraídos a la lista
+#             # data.append({'Nombre': nombre, 'Precio': precio, 'Imagen 1': imagen_1, 'Imagen 2': imagen_2})
+#             data.append({'Nombre': nombre})
+#             # 'Descripcion 3': descripcion_3,
+#             # Pausar entre solicitudes para evitar ser bloqueado
+#             time.sleep(2)
+#     df = pd.DataFrame(data)
     
-    print(data)
-
-    # Devolver un mensaje de éxito
-    return 'Archivo Excel generado con éxito.'
-
-
-# Ruta para extraer hipervínculos de un archivo Excel y guardarlos en otro archivo Excel
-@app.route('/extract_links', methods=['POST'])
-def extract_links():
-    # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
-    file = request.files['file']
+#     # Eliminar las filas duplicadas
+#     df.drop_duplicates(subset=['Nombre'], keep='first', inplace=True)
     
-    # Abre el libro de Excel
-    workbook = openpyxl.load_workbook(file)
-    sheet = workbook['Links']  # Cambia el nombre de la hoja según sea necesario
+#     # Guardar el DataFrame en un archivo Excel
+#     df.to_excel('Productos5.xlsx', index=False)
+#     print(data)
+#     # Devolver un mensaje de éxito
+#     return 'Archivo Excel generado con éxito.'
+# # Ruta para extraer hipervínculos de un archivo Excel y guardarlos en otro archivo Excel
+# @app.route('/extract_links', methods=['POST'])
+# def extract_links():
+#     # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
+#     file = request.files['file']
+#     # Abre el libro de Excel
+#     workbook = openpyxl.load_workbook(file)
+#     sheet = workbook['Links']  # Cambia el nombre de la hoja según sea necesario
+#     data = []
+#     # Recorre las filas y extrae los hipervínculos
+#     for row in sheet.iter_rows():
+#         cell = row[2]  # Cambia el índice de columna según sea necesario
+#         if cell.hyperlink:
+#             nombre = cell.value
+#             urls = cell.hyperlink.target
+#             # Agregar los datos extraídos a la lista
+#             data.append({'Nombre del producto': nombre, 'URL': urls})
+#     # Crear un DataFrame de pandas con los datos extraídos
+#     df = pd.DataFrame(data)
+#     # Guardar el DataFrame en un archivo Excel
+#     df.to_excel('URLs.xlsx', index=False)
+#     print(data)
+#     return "Nombres y URLs extraídos y guardados en 'URLs.xlsx'"
+# # Ejecutar la aplicación Flask
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
-    data = []
 
-    # Recorre las filas y extrae los hipervínculos
-    for row in sheet.iter_rows():
-        cell = row[2]  # Cambia el índice de columna según sea necesario
-        if cell.hyperlink:
-            nombre = cell.value
-            urls = cell.hyperlink.target
 
-            # Agregar los datos extraídos a la lista
-            data.append({'Nombre del producto': nombre, 'URL': urls})
 
-    # Crear un DataFrame de pandas con los datos extraídos
-    df = pandas.DataFrame(data)
-    # Guardar el DataFrame en un archivo Excel
-    df.to_excel('URLs.xlsx', index=False)
-    
-    print(data)
 
-    return "Nombres y URLs extraídos y guardados en 'URLs.xlsx'"
 
-# Ejecutar la aplicación Flask
-if __name__ == '__main__':
-    app.run(debug=True)
+
+
 
 
 
@@ -543,6 +627,73 @@ if __name__ == '__main__':
 #     app.run(debug=True)
 
 
+# -------------------------------------------------------------------
 
 
+# ESTE ES EL MISMO CODIGO QUE SIRVE PERO SIN EL OTRO ENDPOINT
 
+# from flask import Flask, request, render_template_string
+# import openpyxl
+# import pandas
+# import requests
+# from bs4 import BeautifulSoup
+# import time
+
+# app = Flask(__name__)
+
+# # Ruta para la página principal que muestra el formulario
+# @app.route('/')
+# def index():
+#     # Renderiza el formulario HTML
+#     return render_template_string(open('index.html').read())
+
+# # Ruta para procesar los datos enviados desde el formulario
+# @app.route('/procesar', methods=['POST'])
+# def procesar():
+#     # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
+#     urls = request.form['urls'].split('\n')
+#     data = []
+
+#     # Iterar sobre cada URL para extraer la información del producto
+#     for url in urls:
+#         # try:
+#             response = requests.get(url.strip())  # Realizar la solicitud HTTP a la URL
+#             response.raise_for_status()  # Verificar si la solicitud fue exitosa
+#             soup = BeautifulSoup(response.content, 'html.parser')  # Parsear el contenido HTML                        
+            
+#             # # Extraer el nombre y el precio del producto usando selectores CSS
+#             nombre = soup.select_one('h1').text if soup.select_one('h1') else 'N/A'
+            
+#             precio_entero = soup.select_one('span.andes-money-amount__fraction').text if soup.select_one('span.andes-money-amount__fraction') else 'N/A'
+#             precio_decimal = soup.select_one('span.andes-money-amount__cents').text if soup.select_one('span.andes-money-amount__cents') else '00'            
+#             # Combinar la parte entera y decimal del precio
+#             precio = f"{precio_entero},{precio_decimal}" if precio_entero != 'N/A' else 'N/A'
+
+#             # Extraer URLs de las imágenes
+#             imagenes = soup.select('img.ui-pdp-image.ui-pdp-gallery__figure__image')
+#             imagen_1 = imagenes[0].get('data-zoom', imagenes[0].get('src')) if len(imagenes) > 0 else 'N/A'
+#             imagen_2 = imagenes[1].get('data-zoom', imagenes[1].get('src')) if len(imagenes) > 1 else 'N/A'
+            
+#             condicion_tag = soup.select_one('span.ui-pdp-subtitle')
+#             if condicion_tag is not None:
+#               condicion = condicion_tag.text.strip()
+              
+#             descripcion = soup.select_one("p.ui-pdp-description__content").text.strip() if soup.select_one('p.ui-pdp-description__content') else "Descripcion no encontrada"
+#             descripcion2 = soup.select_one("div.ui-pdp-description").text.strip() if soup.select_one('div.ui-pdp-description') else "Descripcion no encontrada"
+
+#             # Agregar los datos extraídos a la lista
+#             data.append({'Nombre':nombre, 'Precio':precio, 'Condicion': condicion, 'Descripcion': descripcion, 'Descripcion 2': descripcion2, 'Imagen 1': imagen_1, 'Imagen 2': imagen_2 })            
+
+#     # Crear un DataFrame de pandas con los datos extraídos
+#     df = pandas.DataFrame(data)
+#     # Guardar el DataFrame en un archivo Excel
+#     df.to_excel('Productos.xlsx', index=False)
+    
+#     print(data)
+
+#     # Devolver un mensaje de éxito
+#     return 'Archivo Excel generado con éxito.'
+
+# # Ejecutar la aplicación Flask
+# if __name__ == '__main__':
+#     app.run(debug=True)
