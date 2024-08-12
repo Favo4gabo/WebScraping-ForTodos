@@ -11,6 +11,8 @@ requests = "*"
 beautifulsoup4 = "*"
 openpyxl = "*"
 selenium = "*"
+asyncio = "*"
+aiohttp = "*"
 
 [dev-packages]
 
