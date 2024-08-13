@@ -321,75 +321,75 @@
 
 # ESTE ES EL MISMO CODIGO QUE SIRVE PERO SIN EL OTRO ENDPOINT
 
-from flask import Flask, request, render_template_string
-# import openpyxl
-import pandas
-import requests
-from bs4 import BeautifulSoup
-import time
+# from flask import Flask, request, render_template_string
+# # import openpyxl
+# import pandas
+# import requests
+# from bs4 import BeautifulSoup
+# import time
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
-# Ruta para la página principal que muestra el formulario
-@app.route('/')
-def index():
-    # Renderiza el formulario HTML
-    return render_template_string(open('index.html').read())
+# # Ruta para la página principal que muestra el formulario
+# @app.route('/')
+# def index():
+#     # Renderiza el formulario HTML
+#     return render_template_string(open('index.html').read())
 
-# Ruta para procesar los datos enviados desde el formulario
-@app.route('/procesar', methods=['POST'])
-def procesar():
-    # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
-    urls = request.form['urls'].split('\n')
-    data = []
+# # Ruta para procesar los datos enviados desde el formulario
+# @app.route('/procesar', methods=['POST'])
+# def procesar():
+#     # Obtener las URLs ingresadas en el formulario y dividirlas en una lista
+#     urls = request.form['urls'].split('\n')
+#     data = []
 
     
-    # Iterar sobre cada URL para extraer la información del producto
-    for url in urls:
-            time.sleep(1)
-            response = requests.get(url.strip())  # Realizar la solicitud HTTP a la URL
-            response.raise_for_status()  # Verificar si la solicitud fue exitosa
-            soup = BeautifulSoup(response.content, 'html.parser')  # Parsear el contenido HTML                        
+#     # Iterar sobre cada URL para extraer la información del producto
+#     for url in urls:
+#             time.sleep(1)
+#             response = requests.get(url.strip())  # Realizar la solicitud HTTP a la URL
+#             response.raise_for_status()  # Verificar si la solicitud fue exitosa
+#             soup = BeautifulSoup(response.content, 'html.parser')  # Parsear el contenido HTML                        
             
-            # # Extraer la informacion del producto usando selectores CSS
-            nombre = soup.find('h1', class_='ui-pdp-title').text if soup.find('h1', class_='ui-pdp-title') else 'N/A'            
-            precio_entero = soup.find('span', class_='andes-money-amount__fraction').text if soup.find('span', class_='andes-money-amount__fraction') else 'N/A'
-            precio_decimal = soup.find('span', class_='andes-money-amount__cents').text if soup.find('span', class_='andes-money-amount__cents') else '00'            
-            # Combinar la parte entera y decimal del precio
-            precio = f"{precio_entero},{precio_decimal}" if precio_entero != 'N/A' else 'N/A'                        
-            condicion = soup.find('span', class_='ui-pdp-subtitle').text if soup.find('span', class_='ui-pdp-subtitle') else "N/A"
-            # descripcion = soup.find('p', class_='ui-pdp-description__content').text if soup.find('p', class_='ui-pdp-description__content') else soup.find('div', id_='description')
-            # descripcion = soup.find('p', class_='ui-pdp-description__content').text if soup.find('p', class_='ui-pdp-description__content').text else soup.find('div', id_='description')
-            # Extraer la descripción del producto
-            descripcion_div = soup.find('div', id='description').text
-            descripcion_p = soup.find('p', class_='ui-pdp-description__content')
-            print(descripcion_p.text) if descripcion_p else print('N/A')
-            descripcion = descripcion_div.text if descripcion_div else (descripcion_p.text if descripcion_p else 'N/A')
-            # Extraer URLs de las imágenes
-            imagenes = soup.select('img.ui-pdp-image.ui-pdp-gallery__figure__image')
-            imagen_1 = imagenes[0].get('data-zoom', imagenes[0].get('src')) if len(imagenes) > 0 else 'N/A'
-            imagen_2 = imagenes[1].get('data-zoom', imagenes[1].get('src')) if len(imagenes) > 1 else 'N/A'
+#             # # Extraer la informacion del producto usando selectores CSS
+#             nombre = soup.find('h1', class_='ui-pdp-title').text if soup.find('h1', class_='ui-pdp-title') else 'N/A'            
+#             precio_entero = soup.find('span', class_='andes-money-amount__fraction').text if soup.find('span', class_='andes-money-amount__fraction') else 'N/A'
+#             precio_decimal = soup.find('span', class_='andes-money-amount__cents').text if soup.find('span', class_='andes-money-amount__cents') else '00'            
+#             # Combinar la parte entera y decimal del precio
+#             precio = f"{precio_entero},{precio_decimal}" if precio_entero != 'N/A' else 'N/A'                        
+#             condicion = soup.find('span', class_='ui-pdp-subtitle').text if soup.find('span', class_='ui-pdp-subtitle') else "N/A"
+#             # descripcion = soup.find('p', class_='ui-pdp-description__content').text if soup.find('p', class_='ui-pdp-description__content') else soup.find('div', id_='description')
+#             # descripcion = soup.find('p', class_='ui-pdp-description__content').text if soup.find('p', class_='ui-pdp-description__content').text else soup.find('div', id_='description')
+#             # Extraer la descripción del producto
+#             descripcion_div = soup.find('div', id='description').text
+#             descripcion_p = soup.find('p', class_='ui-pdp-description__content')
+#             print(descripcion_p.text) if descripcion_p else print('N/A')
+#             descripcion = descripcion_div.text if descripcion_div else (descripcion_p.text if descripcion_p else 'N/A')
+#             # Extraer URLs de las imágenes
+#             imagenes = soup.select('img.ui-pdp-image.ui-pdp-gallery__figure__image')
+#             imagen_1 = imagenes[0].get('data-zoom', imagenes[0].get('src')) if len(imagenes) > 0 else 'N/A'
+#             imagen_2 = imagenes[1].get('data-zoom', imagenes[1].get('src')) if len(imagenes) > 1 else 'N/A'
 
-            # Agregar los datos extraídos a la lista
-            data.append({'Nombre':nombre, 
-                         'Precio':precio, 
-                         'Condicion': condicion, 
-                         'Descripcion': descripcion,                          
-                         'Imagen 1': imagen_1, 
-                         'Imagen 2': imagen_2 })            
-    # Crear un DataFrame de pandas con los datos extraídos
-    df = pandas.DataFrame(data)
-    # Guardar el DataFrame en un archivo Excel
-    df.to_excel('Productos2.xlsx', index=False)
+#             # Agregar los datos extraídos a la lista
+#             data.append({'Nombre':nombre, 
+#                          'Precio':precio, 
+#                          'Condicion': condicion, 
+#                          'Descripcion': descripcion,                          
+#                          'Imagen 1': imagen_1, 
+#                          'Imagen 2': imagen_2 })            
+#     # Crear un DataFrame de pandas con los datos extraídos
+#     df = pandas.DataFrame(data)
+#     # Guardar el DataFrame en un archivo Excel
+#     df.to_excel('Productos2.xlsx', index=False)
     
-    print(data)    
+#     print(data)    
 
-    # Devolver un mensaje de éxito
-    return 'Archivo Excel generado con éxito.'
+#     # Devolver un mensaje de éxito
+#     return 'Archivo Excel generado con éxito.'
 
-# Ejecutar la aplicación Flask
-if __name__ == '__main__':
-    app.run(debug=True)
+# # Ejecutar la aplicación Flask
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 # ---------------------------------------------------------------------------------------------
 
