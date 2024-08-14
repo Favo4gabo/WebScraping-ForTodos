@@ -188,7 +188,7 @@ import pandas as pd
 
 def generar_excel():
     # Leer el archivo Excel y obtener la columna 'URL'
-    archivo = pd.read_excel('URLs2a100.xlsx', sheet_name='Hoja1')
+    archivo = pd.read_excel('URLs601a700.xlsx', sheet_name='Hoja1')
     datos_columna = archivo['URL']
     urls = datos_columna.tolist()  # Convertir la columna de URLs en una lista
     data = []  # Lista para almacenar los datos extraídos
@@ -238,5 +238,7 @@ def generar_excel():
     
     # Crear un DataFrame de pandas con los datos extraídos y guardarlo en un archivo Excel
     df = pd.DataFrame(data)
-    df.to_excel('Prueba2a100.xlsx', index=False)    
+    df.to_excel('Prueba601a700.xlsx', index=False)    
     return 'Archivo Excel generado con éxito.'
+
+generar_excel()
